@@ -1,4 +1,4 @@
-package cotliner.serversideevent.document.order
+package cotliner.orderservice.document.order
 
 import org.springframework.data.annotation.Id
 import java.util.*

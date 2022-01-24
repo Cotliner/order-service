@@ -1,5 +1,3 @@
-package cotliner.serversideevent.document.order.dto
-
-import java.util.*
+package cotliner.orderservice.document.order.dto
 
 data class OrderInputDto(val buyerMail: String?, val status: String?)
