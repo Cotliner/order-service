@@ -5,12 +5,8 @@ import cotliner.orderservice.repository.OrderRepository
 import cotliner.orderservice.document.order.Order
 import cotliner.orderservice.document.order.dto.OrderInputDto
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.flow.toSet
+import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
@@ -46,21 +42,22 @@ import kotlin.random.Random.Default.nextDouble
     orderRepository.save(this)
   }
 
-  /* TODO-2: RETURN ONLY THE FLOW */
-  suspend fun search(param: SearchParam, request: PageRequest): Page<Order> = with(
+  fun search(
+    param: SearchParam,
+    request: PageRequest
+  ): Flow<Order> = with(
     param
-  ) {
-    PageImpl(
-      orderRepository.findAllByPriceBetween(startPrice, endPrice, request).toList(),
-      request,
-      orderRepository.countByPriceBetween(startPrice, endPrice)
-    )
-  }
+  ) { orderRepository.findAllByPriceBetween(startPrice, endPrice, request) }
 
-  /* TODO-3: RETURN COUNT IN ANOTHER METHOD */
+  suspend fun searchCount(
+    param: SearchParam
+  ): Number = with(
+    param
+  ) { orderRepository.countByPriceBetween(startPrice, endPrice) }
 
-  //  fun delete(id: UUID): Unit = orderRepository.deleteById(id)
-  //
+  /* TODO-1: MAKE THIS METHOD REACTIVE */
+  fun delete(id: UUID): Unit = runBlocking { orderRepository.deleteById(id) }
+
   //  private fun Order.sendMail(): Unit = with(SimpleMailMessage()) {
   //    setFrom(notification)
   //    setTo(buyerMail)

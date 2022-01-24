@@ -7,7 +7,6 @@ import cotliner.orderservice.document.order.Order
 import cotliner.orderservice.document.order.dto.OrderInputDto
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.reactor.mono
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -38,18 +37,23 @@ class OrderResource(
     @RequestBody orderInput: OrderInputDto
   ): Mono<Order> = mono { orderService.update(id, orderInput) }
 
-  /* TODO-4: RETURN ONLY THE FLOW OF ORDER */
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("search")
   fun search(
     @RequestBody param: SearchParam,
     @RequestParam page: Number,
     @RequestParam size: Number
-  ): Mono<Page<Order>> = mono { orderService.search(param, PageRequest.of(page.toInt(), size.toInt())) }
+  ): Flow<Order> = orderService.search(
+    param,
+    PageRequest.of(page.toInt(), size.toInt())
+  )
 
-  /* TODO-5: MAKE ANOTHER ENDPOINT WITH PATH: search-count THAT RETURN THE COUNT NUMBER */
+  @ResponseStatus(HttpStatus.OK)
+  @PostMapping("search-count")
+  fun searchCount(@RequestBody param: SearchParam): Mono<Number> = mono { orderService.searchCount(param) }
 
-  //  @ResponseStatus(HttpStatus.NO_CONTENT)
-  //  @DeleteMapping("{id}")
-  //  fun delete(@PathVariable id: UUID): Unit = orderService.delete(id)
+  /* TODO-2: MAKE THIS ENDPOINT REACTIVE */
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @DeleteMapping("{id}")
+  fun delete(@PathVariable id: UUID): Unit = orderService.delete(id)
 }
