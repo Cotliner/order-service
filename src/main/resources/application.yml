@@ -1,0 +1,4 @@
+spring:
+  mail:
+    values:
+      notification: noreply-notification@order-service.fr

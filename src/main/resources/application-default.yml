@@ -1,0 +1,7 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/order
+  mail:
+    host: 127.0.0.1
+    port: 1025
