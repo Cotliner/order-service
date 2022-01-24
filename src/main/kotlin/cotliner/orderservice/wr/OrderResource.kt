@@ -38,17 +38,16 @@ class OrderResource(
     @RequestBody orderInput: OrderInputDto
   ): Mono<Order> = mono { orderService.update(id, orderInput) }
 
-  /* TODO-3: MAKE THIS ENDPOINT REACTIVE */
+  /* TODO-4: RETURN ONLY THE FLOW OF ORDER */
   @ResponseStatus(HttpStatus.OK)
   @PostMapping("search")
   fun search(
     @RequestBody param: SearchParam,
     @RequestParam page: Number,
     @RequestParam size: Number
-  ): Page<Order> = orderService.search(
-    param,
-    PageRequest.of(page.toInt(), size.toInt())
-  )
+  ): Mono<Page<Order>> = mono { orderService.search(param, PageRequest.of(page.toInt(), size.toInt())) }
+
+  /* TODO-5: MAKE ANOTHER ENDPOINT WITH PATH: search-count THAT RETURN THE COUNT NUMBER */
 
   //  @ResponseStatus(HttpStatus.NO_CONTENT)
   //  @DeleteMapping("{id}")
