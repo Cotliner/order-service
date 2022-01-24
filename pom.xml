@@ -20,36 +20,24 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId> <!-- TODO-1: <artifactId>spring-boot-starter-webflux</artifactId> -->
+			<artifactId>spring-boot-starter-webflux</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb</artifactId> <!-- TODO-2: <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>  -->
+			<artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-mail</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.jetbrains.kotlin</groupId>
 			<artifactId>kotlin-reflect</artifactId>
 		</dependency>
-
-		<!--<dependency>--> <!-- TODO-3: TO ADD -->
-		<!--<groupId>org.jetbrains.kotlinx</groupId>-->
-		<!--<artifactId>kotlinx-coroutines-reactor</artifactId>-->
-		<!--</dependency>--> <!-- TODO-3: TO ADD -->
-
-		<dependency> <!-- TODO 4 => TO REMOVE -->
-			<groupId>com.fasterxml.jackson.module</groupId>
-			<artifactId>jackson-module-kotlin</artifactId>
-		</dependency> <!-- TODO 4 => TO REMOVE -->
-
-		<dependency> <!-- TODO 5 => TO REMOVE -->
-			<groupId>org.jetbrains.kotlin</groupId>
-			<artifactId>kotlin-stdlib-jdk8</artifactId>
-		</dependency> <!-- TODO 5 => TO REMOVE -->
+		<dependency>
+			<groupId>org.jetbrains.kotlinx</groupId>
+			<artifactId>kotlinx-coroutines-reactor</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

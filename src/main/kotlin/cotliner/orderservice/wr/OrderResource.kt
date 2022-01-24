@@ -3,9 +3,12 @@ package cotliner.orderservice.wr
 import cotliner.orderservice.service.OrderService
 import cotliner.orderservice.wr.OrderResource.Companion.URI
 import cotliner.orderservice.document.order.Order
+import cotliner.orderservice.document.order.dto.OrderInputDto
+import kotlinx.coroutines.flow.Flow
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
+import java.util.*
 
 @RequestMapping(value = [ URI ], produces = [MediaType.APPLICATION_JSON_VALUE] )
 @RestController
@@ -17,19 +20,21 @@ class OrderResource(
 
   @ResponseStatus(HttpStatus.OK)
   @GetMapping
-  fun getAll(): List<Order> = orderService.findAll() /* TODO-8: CHANGE RETURN TYPE */
+  fun getAll(): Flow<Order> = orderService.findAll()
 
-  //  @ResponseStatus(HttpStatus.CREATED)
-  //  @PostMapping
-  //  fun create(@RequestBody orderInput: OrderInputDto): Order = orderService.create(orderInput)
-  //
-  //  @ResponseStatus(HttpStatus.OK)
-  //  @PutMapping("{id}")
-  //  fun update(
-  //    @PathVariable id: UUID,
-  //    @RequestBody orderInput: OrderInputDto
-  //  ): Order = orderService.update(id, orderInput)
-  //
+  /* TODO-3: MAKE THIS ENDPOINT REACTIVE */
+  @ResponseStatus(HttpStatus.CREATED)
+  @PostMapping
+  fun create(@RequestBody orderInput: OrderInputDto): Order = orderService.create(orderInput)
+
+  /* TODO-4: MAKE THIS ENDPOINT REACTIVE */
+  @ResponseStatus(HttpStatus.OK)
+  @PutMapping("{id}")
+  fun update(
+    @PathVariable id: UUID,
+    @RequestBody orderInput: OrderInputDto
+  ): Order = orderService.update(id, orderInput)
+
   //  @ResponseStatus(HttpStatus.OK)
   //  @PostMapping("search")
   //  fun search(

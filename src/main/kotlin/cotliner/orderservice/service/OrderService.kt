@@ -2,9 +2,16 @@ package cotliner.orderservice.service
 
 import cotliner.orderservice.repository.OrderRepository
 import cotliner.orderservice.document.order.Order
+import cotliner.orderservice.document.order.dto.OrderInputDto
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
+import java.lang.Exception
+import java.util.*
+import java.util.UUID.randomUUID
+import kotlin.random.Random.Default.nextDouble
 
 @Service class OrderService(
   /* PROPERTIES */
@@ -14,25 +21,27 @@ import org.springframework.stereotype.Service
   /* REPOSITORIES */
   private val orderRepository: OrderRepository
 ) {
-  fun findAll(): List<Order> = orderRepository.findAll() /* TODO-7: CHANGE RETURN TYPE */
+  fun findAll(): Flow<Order> = orderRepository.findAll()
 
-  //  fun create(orderToCreate: OrderInputDto): Order = orderRepository.save(Order(
-  //    UUID.randomUUID(),
-  //    "CREATED",
-  //    Random.nextDouble(1.0, 500.0),
-  //    orderToCreate.buyerMail!!
-  //  ))
-  //
-  //  fun update(
-  //    orderId: UUID,
-  //    orderToUpdate: OrderInputDto
-  //  ): Order = with(
-  //    orderRepository.findById(orderId).orElseThrow()
-  //  ) {
-  //    this.status = orderToUpdate.status!!
-  //    orderRepository.save(this)
-  //  }
-  //
+  /* TODO-1: MAKE THIS METHOD REACTIVE */
+  fun create(orderToCreate: OrderInputDto): Order = runBlocking { orderRepository.save(Order(
+    randomUUID(),
+    "CREATED",
+    nextDouble(1.0, 500.0),
+    orderToCreate.buyerMail!!
+  )) }
+
+  /* TODO-2: MAKE THIS METHOD REACTIVE */
+  fun update(
+    orderId: UUID,
+    orderToUpdate: OrderInputDto
+  ): Order = runBlocking { with(
+    orderRepository.findById(orderId) ?: throw Exception()
+  ) {
+    this.status = orderToUpdate.status!!
+    orderRepository.save(this)
+  } }
+
   //  fun search(param: SearchParam, request: PageRequest): Page<Order> = with(
   //    param
   //  ) { orderRepository.findAllByPriceBetween(startPrice, endPrice, request) }
