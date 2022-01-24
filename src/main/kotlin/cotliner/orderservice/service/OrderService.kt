@@ -1,11 +1,13 @@
 package cotliner.orderservice.service
 
+import cotliner.orderservice.commons.SearchParam
 import cotliner.orderservice.repository.OrderRepository
 import cotliner.orderservice.document.order.Order
 import cotliner.orderservice.document.order.dto.OrderInputDto
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
 import java.lang.Exception
@@ -23,29 +25,28 @@ import kotlin.random.Random.Default.nextDouble
 ) {
   fun findAll(): Flow<Order> = orderRepository.findAll()
 
-  /* TODO-1: MAKE THIS METHOD REACTIVE */
-  fun create(orderToCreate: OrderInputDto): Order = runBlocking { orderRepository.save(Order(
+  suspend fun create(orderToCreate: OrderInputDto): Order = orderRepository.save(Order(
     randomUUID(),
     "CREATED",
     nextDouble(1.0, 500.0),
     orderToCreate.buyerMail!!
-  )) }
+  ))
 
-  /* TODO-2: MAKE THIS METHOD REACTIVE */
-  fun update(
+  suspend fun update(
     orderId: UUID,
     orderToUpdate: OrderInputDto
-  ): Order = runBlocking { with(
+  ): Order = with(
     orderRepository.findById(orderId) ?: throw Exception()
   ) {
     this.status = orderToUpdate.status!!
     orderRepository.save(this)
-  } }
+  }
 
-  //  fun search(param: SearchParam, request: PageRequest): Page<Order> = with(
-  //    param
-  //  ) { orderRepository.findAllByPriceBetween(startPrice, endPrice, request) }
-  //
+  /* TODO-2: CHANGE RETURN TYPE */
+  fun search(param: SearchParam, request: PageRequest): Page<Order> = with(
+    param
+  ) { orderRepository.findAllByPriceBetween(startPrice, endPrice, request) }
+
   //  fun delete(id: UUID): Unit = orderRepository.deleteById(id)
   //
   //  private fun Order.sendMail(): Unit = with(SimpleMailMessage()) {
