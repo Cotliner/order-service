@@ -52,8 +52,7 @@ class OrderResource(
   @PostMapping("search-count")
   fun searchCount(@RequestBody param: SearchParam): Mono<Number> = mono { orderService.searchCount(param) }
 
-  /* TODO-2: MAKE THIS ENDPOINT REACTIVE */
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("{id}")
-  fun delete(@PathVariable id: UUID): Unit = orderService.delete(id)
+  fun delete(@PathVariable id: UUID): Mono<Unit> = mono { orderService.delete(id) }
 }

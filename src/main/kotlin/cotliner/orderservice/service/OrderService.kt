@@ -5,9 +5,9 @@ import cotliner.orderservice.repository.OrderRepository
 import cotliner.orderservice.document.order.Order
 import cotliner.orderservice.document.order.dto.OrderInputDto
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
+import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
 import org.springframework.stereotype.Service
 import java.lang.Exception
@@ -16,10 +16,10 @@ import java.util.UUID.randomUUID
 import kotlin.random.Random.Default.nextDouble
 
 @Service class OrderService(
-  /* PROPERTIES */
-  @Value("\${spring.mail.values.notification}") private val notification: String,
-  /* BEANS */
-  private val mailSender: JavaMailSender,
+  /* PROPERTIES */ /* TODO-3: REMOVE THIS CODE */
+  @Value("\${spring.mail.values.notification}") private val notification: String, /* TODO-3: REMOVE THIS CODE */
+  /* BEANS */ /* TODO-5: CHANGE BEAN TO SHARED FLOW */
+  private val mailSender: JavaMailSender, /* TODO-4: REPLACE THIS BEAN BY private val orderMailer: MutableSharedFlow<Order>, */
   /* REPOSITORIES */
   private val orderRepository: OrderRepository
 ) {
@@ -30,7 +30,7 @@ import kotlin.random.Random.Default.nextDouble
     "CREATED",
     nextDouble(1.0, 500.0),
     orderToCreate.buyerMail!!
-  ))
+  )).also { it.sendMail() } /* TODO-6: CALL CHANNEL orderMailer */
 
   suspend fun update(
     orderId: UUID,
@@ -40,7 +40,7 @@ import kotlin.random.Random.Default.nextDouble
   ) {
     this.status = orderToUpdate.status!!
     orderRepository.save(this)
-  }
+  }.also { it.sendMail() } /* TODO-7: CALL CHANNEL orderMailer */
 
   fun search(
     param: SearchParam,
@@ -55,14 +55,14 @@ import kotlin.random.Random.Default.nextDouble
     param
   ) { orderRepository.countByPriceBetween(startPrice, endPrice) }
 
-  /* TODO-1: MAKE THIS METHOD REACTIVE */
-  fun delete(id: UUID): Unit = runBlocking { orderRepository.deleteById(id) }
+  suspend fun delete(id: UUID): Unit = orderRepository.deleteById(id)
 
-  //  private fun Order.sendMail(): Unit = with(SimpleMailMessage()) {
-  //    setFrom(notification)
-  //    setTo(buyerMail)
-  //    setSubject("Order with id $id")
-  //    setText("Status: $status")
-  //    mailSender.send(this)
-  //  }
+  /* TODO-1: MOVE THIS METHOD IN SharedDataConf CLASS */
+  private fun Order.sendMail(): Unit = with(SimpleMailMessage()) {
+    setFrom(notification)
+    setTo(buyerMail)
+    setSubject("Order with id $id")
+    setText("Status: $status")
+    mailSender.send(this)
+  }
 }
