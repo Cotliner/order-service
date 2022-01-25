@@ -1,11 +1,17 @@
 package cotliner.orderservice.service
 
 import cotliner.orderservice.commons.SearchParam
+import cotliner.orderservice.document.event.Event
+import cotliner.orderservice.document.event.Event.StandardEvent
+import cotliner.orderservice.document.event.enums.EventType.ORDER_CREATED
+import cotliner.orderservice.document.event.enums.EventType.ORDER_UPDATED
 import cotliner.orderservice.repository.OrderRepository
 import cotliner.orderservice.document.order.Order
 import cotliner.orderservice.document.order.dto.OrderInputDto
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import java.lang.Exception
@@ -15,6 +21,7 @@ import kotlin.random.Random.Default.nextDouble
 
 @Service class OrderService(
   /* SHARED FLOW */
+  private val eventFlow: MutableSharedFlow<Event>,
   private val orderMailer: MutableSharedFlow<Order>,
   private val simpleMailer: MutableSharedFlow<String>,
   /* REPOSITORIES */
@@ -28,8 +35,9 @@ import kotlin.random.Random.Default.nextDouble
     nextDouble(1.0, 500.0),
     orderToCreate.buyerMail!!
   )).also {
+    eventFlow.emit(StandardEvent(it.id, ORDER_CREATED, it.buyerMail))
     orderMailer.emit(it)
-    randomMail().collect() /* TODO-1: FIND WAY TO SEND MAIL WITHOUT WAIT */
+    CoroutineScope(Default).launch { randomMail().collect() }
   }
 
   suspend fun update(
@@ -41,8 +49,9 @@ import kotlin.random.Random.Default.nextDouble
     this.status = orderToUpdate.status!!
     orderRepository.save(this)
   }.also {
+    eventFlow.emit(StandardEvent(it.id, ORDER_UPDATED, it.buyerMail))
     orderMailer.emit(it)
-    randomMail().collect() /* TODO-1: FIND WAY TO SEND MAIL WITHOUT WAIT */
+    CoroutineScope(Default).launch { randomMail().collect() }
   }
 
   fun search(

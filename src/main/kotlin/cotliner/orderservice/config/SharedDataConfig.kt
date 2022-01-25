@@ -1,5 +1,6 @@
 package cotliner.orderservice.config
 
+import cotliner.orderservice.document.event.Event
 import cotliner.orderservice.document.order.Order
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
@@ -20,8 +21,10 @@ import org.springframework.mail.javamail.JavaMailSender
   /* BEANS */
   private val mailSender: JavaMailSender
 ) {
-   @DelicateCoroutinesApi
-   @Bean fun orderMailer(): MutableSharedFlow<Order> = MutableSharedFlow<Order>().consumeWith { it.sendMail() }
+  @Bean fun eventFlow(): MutableSharedFlow<Event> = MutableSharedFlow()
+
+  @DelicateCoroutinesApi
+  @Bean fun orderMailer(): MutableSharedFlow<Order> = MutableSharedFlow<Order>().consumeWith { it.sendMail() }
 
   @DelicateCoroutinesApi
   @Bean fun simpleMailer(): MutableSharedFlow<String> = MutableSharedFlow<String>().consumeWith { it.sendMail() }
